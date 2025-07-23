@@ -3,3 +3,5 @@ ig-credentials/
 .env
 node_modules/
 *.zip
+tests/
+test.js

@@ -115,7 +115,7 @@ async function handleInstagramScrape(request, reply, browser) {
         }
 
         reply.code(200).send({
-            _result
+            result: _result
         });
     } 
     catch (err) {

@@ -59,7 +59,7 @@ const scrapePage = async (page, postId) => {
         if (!element) return null;
 
         if (isCarousel) {
-            console.log("CAROUSEL")
+            // console.log("CAROUSEL")
             const video = element.querySelector('video');
             const source = video?.querySelector('source');
             const img = element.querySelector('img');
@@ -72,7 +72,7 @@ const scrapePage = async (page, postId) => {
             if (text) return { content: text, type: 'text' };
             return null;
         } else {
-            console.log("NON-CAROUSEL")
+            // console.log("NON-CAROUSEL")
             const video = element.querySelector('video') ?? element.src;
             if ((video?.src && video.src.startsWith('blob:')) || video) {
                 return { content: video.src ?? video, type: 'video' };
@@ -123,7 +123,7 @@ const scrapePage = async (page, postId) => {
         return output;
         })();
     } else {
-        console.log("DETECTED HERE 1")
+        // console.log("DETECTED HERE 1")
         const article = document.querySelector('article');
         const img = document.querySelector('div._aagv img.x5yr21d');
         const video = document.querySelector('video.x5yr21d');
@@ -135,15 +135,15 @@ const scrapePage = async (page, postId) => {
         });
 
         if (elements[0]) {
-            console.log("DETECTED HERE 2")
+            // console.log("DETECTED HERE 2")
             const extracted = extractContent(elements[0], isCarousel);
             if (extracted) {
-                console.log("DETECTED HERE 3")
+                // console.log("DETECTED HERE 3")
                 const res = [{ mimeUrl: extracted.content, mimeType: extracted.type }];
                 console.log(extracted.type)
                 if ((extracted.type === 'video' || extracted.type === 'image') &&
                     (extracted.content.startsWith('blob:') || extracted.content.includes('scontent'))) {
-                        console.log("DETECTED HERE 4")
+                        // console.log("DETECTED HERE 4")
                         const videoUrls = extractVideoUrls();
                         res[0].mimeType = 'video';
                         res[0].mimeUrl = videoUrls[0];
