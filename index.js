@@ -28,7 +28,7 @@ fastify.decorate('config', {
         headless: true,
         userDataDir: COOKIE_DIR,
         defaultViewport: { width: 1440, height: 1080 },
-        args: ['--start-maximized'],
+        args: ['--start-maximized', '--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     callRoutes(fastify, browser, ); // pasang semua route
