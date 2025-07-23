@@ -48,3 +48,5 @@ fastify.get('/example', async (request, reply) => {
         host: fastify.config.host
     });
 })();
+
+// FINAL
