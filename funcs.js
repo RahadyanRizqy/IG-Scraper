@@ -58,34 +58,36 @@ const scrapePage = async (page, postId) => {
     const extractContent = (element, isCarousel = false) => {
         if (!element) return null;
 
-        const video = element.querySelector('video');
-
         if (isCarousel) {
-        const source = video?.querySelector('source');
-        const img = element.querySelector('img');
+            console.log("CAROUSEL")
+            const video = element.querySelector('video');
+            const source = video?.querySelector('source');
+            const img = element.querySelector('img');
 
-        if (video?.src) return { content: video.src, type: 'video' };
-        if (source?.src) return { content: source.src, type: 'video' };
-        if (img?.src) return { content: img.src, type: 'image' };
+            if (video?.src) return { content: video.src, type: 'video' };
+            if (source?.src) return { content: source.src, type: 'video' };
+            if (img?.src) return { content: img.src, type: 'image' };
 
-        const text = element.textContent.trim();
-        if (text) return { content: text, type: 'text' };
+            const text = element.textContent.trim();
+            if (text) return { content: text, type: 'text' };
             return null;
         } else {
-        if (video?.src && video.src.startsWith('blob:')) {
-            return { content: video.src, type: 'video' };
-        }
+            console.log("NON-CAROUSEL")
+            const video = element.querySelector('video') ?? element.src;
+            if ((video?.src && video.src.startsWith('blob:')) || video) {
+                return { content: video.src ?? video, type: 'video' };
+            }
 
-        const imgTag = element.querySelector('div._aagv img.x5yr21d');
-        if (imgTag?.src && imgTag.src.startsWith('http')) {
-            return { content: imgTag.src, type: 'image' };
-        }
+            const imgTag = element.querySelector('div._aagv img.x5yr21d');
+            if (imgTag?.src && imgTag.src.startsWith('http')) {
+                return { content: imgTag.src, type: 'image' };
+            }
 
-        if (element.src && element.src.startsWith('http')) {
-            return { content: element.src, type: 'image' };
-        }
+            if (element.src && element.src.startsWith('http')) {
+                return { content: element.src, type: 'image' };
+            }
 
-        return null;
+            return null;
         }
     };
 
@@ -121,24 +123,36 @@ const scrapePage = async (page, postId) => {
         return output;
         })();
     } else {
-        const candidates = [
-        document.querySelector('article'),
-        document.querySelector('div._aagv img.x5yr21d'),
-        document.querySelector('video.x5yr21d'),
-        ];
-        const mediaElement = candidates.find(el => el !== null);
-        if (mediaElement) {
-        const extracted = extractContent(mediaElement, isCarousel);
-        if (extracted) {
-            const res = [{ mimeUrl: extracted.content, mimeType: extracted.type }];
-            if ((extracted.type === 'video' || extracted.type === 'image') &&
-                (extracted.content.startsWith('blob:') || extracted.content.includes('scontent'))) {
-            const videoUrls = extractVideoUrls();
-            res[0].mimeType = 'video';
-            res[0].mimeUrl = videoUrls[0];
+        console.log("DETECTED HERE 1")
+        const article = document.querySelector('article');
+        const img = document.querySelector('div._aagv img.x5yr21d');
+        const video = document.querySelector('video.x5yr21d');
+
+        const elements = [article, img, video].filter(el => el !== null);
+
+        elements.sort((a, b) => {
+            return a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_PRECEDING ? 1 : -1;
+        });
+
+        if (elements[0]) {
+            console.log("DETECTED HERE 2")
+            const extracted = extractContent(elements[0], isCarousel);
+            if (extracted) {
+                console.log("DETECTED HERE 3")
+                const res = [{ mimeUrl: extracted.content, mimeType: extracted.type }];
+                console.log(extracted.type)
+                if ((extracted.type === 'video' || extracted.type === 'image') &&
+                    (extracted.content.startsWith('blob:') || extracted.content.includes('scontent'))) {
+                        console.log("DETECTED HERE 4")
+                        const videoUrls = extractVideoUrls();
+                        res[0].mimeType = 'video';
+                        res[0].mimeUrl = videoUrls[0];
+                    }
+                else {
+                    res[0].mimeType = 'image';
+                }
+                return res;
             }
-            return res;
-        }
         }
         return [];
     }

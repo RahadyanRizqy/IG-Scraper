@@ -13,7 +13,8 @@ fastify.decorate('config', {
     port: process.env.SERVER_PORT || 3000,
     host: process.env.SERVER_HOST || '127.0.0.1',
     secretKey: process.env.SECRET_KEY || 'changeme',
-    rateLimitPerMinute: process.env.RATE_LIMIT_PER_MINUTE || 5
+    rateLimitPerMinute: process.env.RATE_LIMIT_PER_MINUTE || 5,
+    headlessStatus: process.env.HEADLESS || true,
 });
 
 // Dekorasi dulu sebelum route
