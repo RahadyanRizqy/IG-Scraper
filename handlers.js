@@ -1,18 +1,21 @@
 const { scrapePage, generateShortCode, mimeMap } = require('./funcs');
 
 function getBaseUrl(request) {
-    const protocol = request.protocol;
-    const host = request.hostname;
-    const port = request.server.config?.port || 80;
+    const protocol = request.headers['x-forwarded-proto'] || request.protocol;
+    const host = request.headers['host'];
 
-    const defaultPort =
-        (protocol === 'http' && port === 80) ||
-        (protocol === 'https' && port === 443);
+    // Pecah host dan port jika ada
+    const [hostname, port] = host.split(':');
 
-    return defaultPort
-        ? `${protocol}://${host}`
-        : `${protocol}://${host}:${port}`;
-    }
+    const isDefaultPort =
+        (protocol === 'http' && (!port || port === '80')) ||
+        (protocol === 'https' && (!port || port === '443'));
+
+    return isDefaultPort
+        ? `${protocol}://${hostname}`
+        : `${protocol}://${hostname}:${port}`;
+}
+
 
 
 async function handleInstagramScrape(request, reply, browser) {

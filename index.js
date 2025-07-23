@@ -16,6 +16,17 @@ fastify.decorate('config', {
     rateLimitPerMinute: process.env.RATE_LIMIT_PER_MINUTE || 5
 });
 
+// Dekorasi dulu sebelum route
+fastify.decorateRequest('getBaseUrl', function () {
+  return `${this.protocol}://${this.headers.host}`;
+});
+
+// Lalu baru definisikan rute
+fastify.get('/example', async (request, reply) => {
+  const baseUrl = request.getBaseUrl(); // Ini akan berisi port juga jika ada
+  return { baseUrl };
+});
+
 (async () => {
     await fastify.register(cors, { origin: '*' });
     await fastify.register(multipart);
