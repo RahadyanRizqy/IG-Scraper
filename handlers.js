@@ -17,7 +17,7 @@ function getBaseUrl(request) {
 
 async function handleInstagramScrape(request, reply, browser) {
     const url = request.body?.url || request.query?.url;
-    const html = request.body?.html ?? 'no';
+    const html = request.query?.html ?? 'no';
 
     const baseUrl = getBaseUrl(request);
 
@@ -50,15 +50,69 @@ async function handleInstagramScrape(request, reply, browser) {
                 alternativeUrl: `${baseUrl}/api/media/${alt}`,
             };
         });
-
-        if (html === 'yes') {
-            return 'html!' // DO HERE
-        }
-        reply.code(200).send({
+        const _result = {
             success: true,
             instagramUrl: url,
             content,
             timestamp: Date.now()
+        }
+        if (html === 'yes') {
+            const htmlPage = `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <title>Instagram Media Result</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        padding: 20px;
+                    }
+                    a {
+                        color: blue;
+                        text-decoration: underline;
+                    }
+                    ul {
+                        padding-left: 20px;
+                    }
+                    li {
+                        margin-bottom: 15px;
+                    }
+                </style>
+            </head>
+            <body>
+                <h2>Instagram Media Result</h2>
+
+                <p><strong>Success:</strong> ${_result.success}</p>
+                <p><strong>Instagram URL:</strong> 
+                    <a href="${_result.instagramUrl}" target="_blank">${_result.instagramUrl}</a>
+                </p>
+
+                <h3>Content:</h3>
+                <ul>
+                    ${_result.content.map(item => `
+                        <li>
+                            <strong>Index:</strong> ${item.index}<br>
+                            <strong>MIME Type:</strong> ${item.mimeType}<br>
+                            <strong>Mime URL:</strong> 
+                            <a href="${item.mimeUrl}" target="_blank">${item.mimeUrl}</a><br>
+                            <strong>Alternative URL:</strong> 
+                            <a href="${item.alternativeUrl}" target="_blank">${item.alternativeUrl}</a>
+                        </li>
+                    `).join('')}
+                </ul>
+
+                <p><strong>Timestamp:</strong> ${_result.timestamp}</p>
+            </body>
+            </html>
+            `;
+            return reply
+                .type('text/html')   // ⬅️ Memberi tahu browser ini HTML
+                .send(htmlPage);     // ⬅️ Kirim HTML-nya
+        }
+
+        reply.code(200).send({
+            _result
         });
     } 
     catch (err) {
