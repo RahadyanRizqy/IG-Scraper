@@ -24,7 +24,7 @@ const sharedConfig = {
 };
 
 const isWindows = process.platform === 'win32';
-const socketPath = isWindows ? winSockPath : unixSockPath; // pakai /tmp lebih aman
+const socketPath = isWindows ? sharedConfig.winSockPath : sharedConfig.unixSockPath; // pakai /tmp lebih aman
 
 if (!isWindows && fs.existsSync(socketPath)) {
   try {
