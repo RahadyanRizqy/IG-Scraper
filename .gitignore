@@ -7,3 +7,4 @@ tests/
 test.js
 cookies.json
 sockettest.js
+cache/
