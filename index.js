@@ -37,7 +37,7 @@ fastify.get('/example', async (request, reply) => {
     });
 
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         defaultViewport: { width: 1440, height: 1080 },
         args: [
     '--no-sandbox',
