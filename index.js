@@ -18,7 +18,7 @@ const sharedConfig = {
     rateLimitPerMinute: process.env.RATE_LIMIT_PER_MINUTE || 5,
     headlessValue: String(process.env.HEADLESS).toLowerCase() === 'true',
     socket: String(process.env.SOCKET).toLowerCase() === 'true',
-    restfulApi: String(process.env.RESTFUL_API).toLowerCase() === 'true',
+    restApi: String(process.env.REST_API).toLowerCase() === 'true',
     winSockPath: process.env.WIN_SOCKET,
     unixSockPath: process.env.UNIX_SOCKET
 };
@@ -76,7 +76,7 @@ async function setupFastifyInstance() {
     const socketServer = await setupFastifyInstance(); // server kedua untuk socket
 
     // 🔌 Jalankan HTTP API
-    if (sharedConfig.restfulApi) {
+    if (sharedConfig.restApi) {
         httpServer.listen({ port: sharedConfig.port, host: sharedConfig.host })
             .then(addr => console.log(`🚀 HTTP API listening at ${addr}`))
             .catch(err => {
