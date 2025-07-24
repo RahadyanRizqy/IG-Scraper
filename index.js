@@ -5,7 +5,7 @@ const fastifyStatic = require('@fastify/static');
 const path = require('path');
 const puppeteer = require('puppeteer');
 const callRoutes = require('./routes');
-const { COOKIE_DIR } = require('./funcs');
+// const { COOKIE_DIR } = require('./funcs');
 
 require('dotenv').config();
 
@@ -37,8 +37,7 @@ fastify.get('/example', async (request, reply) => {
     });
 
     const browser = await puppeteer.launch({
-        headless: true,
-        userDataDir: COOKIE_DIR,
+        headless: false,
         defaultViewport: { width: 1440, height: 1080 },
         args: [
     '--no-sandbox',

@@ -1,4 +1,5 @@
 const { scrapePage, generateShortCode, mimeMap } = require('./funcs');
+const fs = require('fs');
 
 function getBaseUrl(request) {
     const protocol = request.headers['x-forwarded-proto'] || request.protocol;
@@ -146,8 +147,45 @@ async function handleApiStatus(_, reply) {
     });
 };
 
+async function handleCheckAuth(request, reply, browser) {
+  const cookiesPath = './cookies.json';
+  try {
+    const page = await browser.newPage();
+    const cookies = JSON.parse(fs.readFileSync(cookiesPath));
+    await page.setCookie(...cookies);
+
+    await page.goto('https://www.instagram.com/accounts/edit', {
+      waitUntil: 'networkidle2',
+    });
+
+    const currentUrl = page.url();
+
+    if (currentUrl.includes('/accounts/login')) {
+      return reply.send({
+        success: false,
+        status: 'logged out'
+      });
+    } else {
+      return reply.send({
+        success: true,
+        status: 'logged in'
+      });
+    }
+  } catch (err) {
+    request.log.error(err);
+    return reply.status(500).send({
+      success: false,
+      status: 'internal error',
+      error: err.message
+    });
+  } finally {
+    if (browser) await browser.close();
+  }
+}
+
 module.exports = {
     handleInstagramScrape,
     handleMediaRedirect,
-    handleApiStatus
+    handleApiStatus,
+    handleCheckAuth
 };

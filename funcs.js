@@ -1,8 +1,9 @@
 const crypto = require('crypto');
 const path = require('path');
+const fs = require('fs');
 
 const mimeMap = new Map();
-const COOKIE_DIR = path.resolve(__dirname, 'ig-credentials');
+// const COOKIE_DIR = path.resolve(__dirname, 'ig-credentials');
 
 function generateShortCode(url, length = 10) {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -15,6 +16,10 @@ function generateShortCode(url, length = 10) {
 }
 
 const scrapePage = async (page, postId) => {
+    const cookiesPath = './cookies.json';
+    const cookies = JSON.parse(fs.readFileSync(cookiesPath));
+    await page.setCookie(...cookies);
+
     await page.evaluateOnNewDocument(() => {
         Object.defineProperty(navigator, 'webdriver', {
             get: () => false,
@@ -165,7 +170,6 @@ const scrapePage = async (page, postId) => {
 };
 
 module.exports = {
-    COOKIE_DIR,
     mimeMap,
     generateShortCode,
     scrapePage,
