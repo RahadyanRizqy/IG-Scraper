@@ -22,7 +22,7 @@ const fs = require('fs');
   await page.setCookie(...cookies);
 
   // Pergi ke halaman edit profil
-  const response = await page.goto('https://www.instagram.com/accounts/edit', {
+  const response = await page.goto('https://www.instagram.com/accounts/login', {
     waitUntil: 'networkidle2',
   });
 

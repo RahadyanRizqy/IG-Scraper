@@ -19,12 +19,13 @@ const sharedConfig = {
     headlessValue: String(process.env.HEADLESS).toLowerCase() === 'true',
     socket: String(process.env.SOCKET).toLowerCase() === 'true',
     restApi: String(process.env.REST_API).toLowerCase() === 'true',
+    logger: String(process.env.LOGGER).toLowerCase() === 'true',
     winSockPath: process.env.WIN_SOCKET,
     unixSockPath: process.env.UNIX_SOCKET
 };
 
 const isWindows = process.platform === 'win32';
-const socketPath = isWindows ? sharedConfig.winSockPath : sharedConfig.unixSockPath; // pakai /tmp lebih aman
+const socketPath = isWindows ? '\\\\.\\pipe\\myapisocket' : sharedConfig.unixSockPath; // pakai /tmp lebih aman
 
 if (!isWindows && fs.existsSync(socketPath)) {
   try {
@@ -34,10 +35,11 @@ if (!isWindows && fs.existsSync(socketPath)) {
   }
 }
 
-async function setupFastifyInstance() {
-    const fastify = createFastify({ logger: true, trustProxy: true });
+async function setupFastifyInstance(isScoket=false) {
+    const fastify = createFastify({ logger: sharedConfig.logger, trustProxy: true });
 
-    fastify.decorate('config', sharedConfig);
+    const config = { ...sharedConfig, isScoket};
+    fastify.decorate('config', config);
 
     fastify.decorateRequest('getBaseUrl', function () {
         return `${this.protocol}://${this.headers.host}`;
@@ -72,11 +74,11 @@ async function setupFastifyInstance() {
 }
 
 (async () => {
-    const httpServer = await setupFastifyInstance();
-    const socketServer = await setupFastifyInstance(); // server kedua untuk socket
-
+    
+    
     // 🔌 Jalankan HTTP API
     if (sharedConfig.restApi) {
+        const httpServer = await setupFastifyInstance(false);
         httpServer.listen({ port: sharedConfig.port, host: sharedConfig.host })
             .then(addr => console.log(`🚀 HTTP API listening at ${addr}`))
             .catch(err => {
@@ -87,6 +89,7 @@ async function setupFastifyInstance() {
 
     // 🔌 Jalankan Unix Socket / Named Pipe
     if (sharedConfig.socket) {
+        const socketServer = await setupFastifyInstance(true); // server kedua untuk socket
         socketServer.listen({ path: socketPath })
             .then(() => {
                 if (!isWindows) fs.chmodSync(socketPath, 0o766);

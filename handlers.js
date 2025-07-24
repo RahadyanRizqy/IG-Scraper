@@ -42,7 +42,7 @@ function generateHtmlResult(_result) {
     <body>
         <h2>Instagram Media Result</h2>
         <p><strong>Success:</strong> ${_result.success}</p>
-        <p><strong>Instagram URL:</strong> 
+        <p><strong>Instagram URL:</strong>
             <a href="${_result.instagramUrl}" target="_blank">${_result.instagramUrl}</a>
         </p>
         <h3>Content:</h3>
@@ -51,10 +51,10 @@ function generateHtmlResult(_result) {
                 <li>
                     <strong>Index:</strong> ${item.index}<br>
                     <strong>MIME Type:</strong> ${item.mimeType}<br>
-                    <strong>Mime URL:</strong> 
+                    <strong>Mime URL:</strong>
                     <a href="${item.mimeUrl}" target="_blank">${item.mimeUrl}</a><br>
-                    <strong>Alternative URL:</strong> 
-                    <a href="${item.alternativeUrl}" target="_blank">${item.alternativeUrl}</a>
+                    <strong>Alternative URL:</strong>
+                    <a href="${item.altUrl}" target="_blank">${item.altUrl}</a>
                 </li>
             `).join('')}
         </ul>
@@ -108,12 +108,11 @@ async function handleInstagramScrape(request, reply, browser) {
         const content = scraped.map((item, index) => {
             const alt = generateShortCode(item.mimeUrl);
             mimeMap.set(alt, item.mimeUrl);
-            // console.log(mimeMap)
             return {
                 index,
                 mimeUrl: item.mimeUrl,
                 mimeType: item.mimeType,
-                alternativeUrl: `${baseUrl}/api/media/${alt}`,
+                altUrl: `${baseUrl}/api/media/${alt}`, // ⬅️ kondisi altUrl
             };
         });
 
@@ -124,13 +123,16 @@ async function handleInstagramScrape(request, reply, browser) {
             timestamp: Date.now()
         };
 
-        // 💾 Simpan ke cache file
-        fs.writeFileSync(cachePath, JSON.stringify(_result), 'utf-8');
+        // 🚫 Jangan simpan ke cache jika konten kosong
+        if (content.length > 0) {
+            fs.writeFileSync(cachePath, JSON.stringify(_result), 'utf-8');
+        }
 
         if (html === 'yes') {
             return reply.type('text/html').send(generateHtmlResult(_result));
         }
 
+        console.log(_result);
         return reply.code(200).send({ result: _result });
 
     } catch (err) {
@@ -145,9 +147,9 @@ function handleMediaRedirect(request, reply) {
     if (url) {
         reply.redirect(url);
     } else {
-        reply.code(404).send({ 
-            success: false, 
-            error: 'Media not found' 
+        reply.code(404).send({
+            success: false,
+            error: 'Media not found'
         });
     }
 }

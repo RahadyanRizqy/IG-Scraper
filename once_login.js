@@ -5,7 +5,6 @@ const fs = require('fs-extra');
   const browser = await puppeteer.launch({
     headless: false,
     args: ['--no-sandbox'],
-    userDataDir: './ig-credentials', // Profile akan tetap disimpan juga
     defaultViewport: null
   });
 
