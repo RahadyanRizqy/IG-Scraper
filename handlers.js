@@ -166,6 +166,7 @@ async function handleCheckAuth(request, reply, browser) {
         status: 'logged out'
       });
     } else {
+        await page.close();
       return reply.send({
         success: true,
         status: 'logged in'
@@ -173,13 +174,14 @@ async function handleCheckAuth(request, reply, browser) {
     }
   } catch (err) {
     request.log.error(err);
+    await page.close();
     return reply.status(500).send({
       success: false,
       status: 'internal error',
       error: err.message
     });
   } finally {
-    if (browser) await browser.close();
+    if (browser) await page.close();
   }
 }
 
