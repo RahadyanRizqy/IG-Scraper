@@ -41,10 +41,11 @@ fastify.get('/example', async (request, reply) => {
         userDataDir: COOKIE_DIR,
         defaultViewport: { width: 1440, height: 1080 },
         args: [
-            '--start-maximized', 
-            '--no-sandbox', 
-            '--disable-setuid-sandbox',
-            '--disable-blink-features=AutomationControlled'
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-gpu',
+    '--disable-dev-shm-usage',
+    '--window-size=1920,1080',
         ],
     });
 
