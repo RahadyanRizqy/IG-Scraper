@@ -167,19 +167,19 @@ async function handleCheckAuth(request, reply, browser) {
       });
     } else {
         await page.close();
-      return reply.send({
-        success: true,
-        status: 'logged in'
-      });
+        return reply.send({
+            success: true,
+            status: 'logged in'
+        });
     }
   } catch (err) {
-    request.log.error(err);
-    await page.close();
-    return reply.status(500).send({
-      success: false,
-      status: 'internal error',
-      error: err.message
-    });
+        request.log.error(err);
+        await page.close();
+        return reply.status(500).send({
+            success: false,
+            status: 'internal error',
+            error: err.message
+        });
   } finally {
     if (browser) await page.close();
   }
