@@ -15,6 +15,11 @@ function generateShortCode(url, length = 10) {
 }
 
 const scrapePage = async (page, postId) => {
+    await page.evaluateOnNewDocument(() => {
+        Object.defineProperty(navigator, 'webdriver', {
+            get: () => false,
+        });
+    });
     await page.goto(`https://www.instagram.com/p/${postId}/`, { waitUntil: 'networkidle2' });
     await page.setViewport({ width: 1440, height: 1080 });
 

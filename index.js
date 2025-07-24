@@ -40,7 +40,12 @@ fastify.get('/example', async (request, reply) => {
         headless: true,
         userDataDir: COOKIE_DIR,
         defaultViewport: { width: 1440, height: 1080 },
-        args: ['--start-maximized', '--no-sandbox', '--disable-setuid-sandbox'],
+        args: [
+            '--start-maximized', 
+            '--no-sandbox', 
+            '--disable-setuid-sandbox',
+            '--disable-blink-features=AutomationControlled'
+        ],
     });
 
     callRoutes(fastify, browser, ); // pasang semua route
